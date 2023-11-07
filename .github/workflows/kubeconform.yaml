@@ -19,6 +19,7 @@ jobs:
           ./tools/kubeconform
           --summary
           --strict
+          --output pretty
           --ignore-filename-pattern cloudbuild.yaml
           --ignore-filename-pattern ".*\.json"
           --ignore-filename-pattern "/helm"
