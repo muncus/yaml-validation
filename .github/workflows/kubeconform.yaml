@@ -1,0 +1,29 @@
+name: Kubeconform
+on:
+  workflow_call:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  kubeconform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Install kubeconform
+        run: >
+          curl -L -O https://github.com/yannh/kubeconform/releases/download/v0.6.3/kubeconform-linux-amd64.tar.gz && tar zxvf kubeconform-linux-amd64.tar.gz
+      - name: Run Check
+        run: >
+          ./kubeconform
+          --summary
+          --strict
+          --ignore-filename-pattern cloudbuild.yaml
+          --ignore-filename-pattern ".*\.json"
+          --ignore-filename-pattern "/helm"
+          --ignore-filename-pattern kustomization.yaml
+          --ignore-filename-pattern "\.github/"
+          --ignore-filename-pattern alert-policy.yaml
+          --ignore-filename-pattern dashboard.yaml
+          --ignore-missing-schemas
+          testdata/
