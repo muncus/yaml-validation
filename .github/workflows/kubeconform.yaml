@@ -31,6 +31,7 @@ jobs:
           --ignore-missing-schemas
           testdata/
       - name: Check Latest GKE version
+        if: ${{ always() }}
         run: >
           ./tools/kubeconform
           --kubernetes-version 1.27.4
