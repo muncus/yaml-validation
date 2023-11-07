@@ -1,0 +1,51 @@
+options:
+  env:
+    - 'KUBECONFORM_VERSION=v0.6.3'
+    - 'GKE_MINIMUM=1.24.15'
+    - 'GKE_MAXIMUM=1.27.4'
+  dynamic_substitutions: true
+
+steps:
+  - name: 'gcr.io/cloud-builders/curl'
+    script: |
+      mkdir tools && cd tools
+      curl -L -O https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz && tar zxvf kubeconform-linux-amd64.tar.gz
+
+  - name: 'ubuntu'
+    script: |
+      #!/bin/bash
+      apt-get update
+      apt-get -y install ca-certificates
+
+      echo Validating with kubernetes version ${GKE_MINIMUM}
+      ./tools/kubeconform \
+      --kubernetes-version ${GKE_MINIMUM} \
+      --summary \
+      --strict \
+      --output pretty \
+      --ignore-filename-pattern cloudbuild.yaml \
+      --ignore-filename-pattern ".*\.json" \
+      --ignore-filename-pattern "/helm" \
+      --ignore-filename-pattern kustomization.yaml \
+      --ignore-filename-pattern "\.github/" \
+      --ignore-filename-pattern alert-policy.yaml \
+      --ignore-filename-pattern dashboard.yaml \
+      --ignore-missing-schemas \
+      testdata/
+
+      echo Validating with kubernetes version ${GKE_MAXIMUM}
+      ./tools/kubeconform \
+      --kubernetes-version ${GKE_MAXIMUM} \
+      --summary \
+      --strict \
+      --output pretty \
+      --ignore-filename-pattern cloudbuild.yaml \
+      --ignore-filename-pattern ".*\.json" \
+      --ignore-filename-pattern "/helm" \
+      --ignore-filename-pattern kustomization.yaml \
+      --ignore-filename-pattern "\.github/" \
+      --ignore-filename-pattern alert-policy.yaml \
+      --ignore-filename-pattern dashboard.yaml \
+      --ignore-missing-schemas \
+      testdata/
+
