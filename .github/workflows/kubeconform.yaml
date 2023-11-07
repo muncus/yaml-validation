@@ -14,9 +14,26 @@ jobs:
         run: >
           mkdir tools && cd tools &&
           curl -L -O https://github.com/yannh/kubeconform/releases/download/v0.6.3/kubeconform-linux-amd64.tar.gz && tar zxvf kubeconform-linux-amd64.tar.gz
-      - name: Run Check
+      - name: Check Earliest GKE version
         run: >
           ./tools/kubeconform
+          --kubernetes-version 1.24.15
+          --summary
+          --strict
+          --output pretty
+          --ignore-filename-pattern cloudbuild.yaml
+          --ignore-filename-pattern ".*\.json"
+          --ignore-filename-pattern "/helm"
+          --ignore-filename-pattern kustomization.yaml
+          --ignore-filename-pattern "\.github/"
+          --ignore-filename-pattern alert-policy.yaml
+          --ignore-filename-pattern dashboard.yaml
+          --ignore-missing-schemas
+          testdata/
+      - name: Check Latest GKE version
+        run: >
+          ./tools/kubeconform
+          --kubernetes-version 1.27.4
           --summary
           --strict
           --output pretty
