@@ -4,6 +4,11 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  KUBECONFORM_VERSION: v0.6.3
+  GKE_MINIMUM: 1.24.15
+  GKE_MAXIMUM: 1.27.4
+
 jobs:
   kubeconform:
     runs-on: ubuntu-latest
@@ -13,11 +18,11 @@ jobs:
       - name: Install kubeconform
         run: >
           mkdir tools && cd tools &&
-          curl -L -O https://github.com/yannh/kubeconform/releases/download/v0.6.3/kubeconform-linux-amd64.tar.gz && tar zxvf kubeconform-linux-amd64.tar.gz
+          curl -L -O https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz && tar zxvf kubeconform-linux-amd64.tar.gz
       - name: Check Earliest GKE version
         run: >
           ./tools/kubeconform
-          --kubernetes-version 1.24.15
+          --kubernetes-version ${GKE_MINIMUM}
           --summary
           --strict
           --output pretty
@@ -34,7 +39,7 @@ jobs:
         if: ${{ always() }}
         run: >
           ./tools/kubeconform
-          --kubernetes-version 1.27.4
+          --kubernetes-version ${GKE_MAXIMUM}
           --summary
           --strict
           --output pretty
